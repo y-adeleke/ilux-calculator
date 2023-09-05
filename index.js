@@ -1,68 +1,80 @@
-`use strict`;
+"use strict";
 
-///
-const calcShow = document.querySelector("p");
-const calSolution = document.querySelector("h1");
+// Elements
+const calculationDisplay = document.querySelector("p");
+const calculationSolution = document.querySelector("h1");
 const clearAllButton = document.querySelector(".row-1-AC");
 const deleteButton = document.querySelector(".row-1-x");
 const equalButton = document.querySelector(".row-6-equalsign");
 const daylight = document.querySelector("#display-daylight");
 const darkmode = document.querySelector("#display-darkmode");
 const allButtons = document.querySelectorAll(".btn-cl");
-const time = document.querySelector(".time");
-const day = document.querySelector(".day");
+const timeDisplay = document.querySelector(".time");
+const dayDisplay = document.querySelector(".day");
 
-//////////// DARK AND LIGHT MODE   ////////////
-daylight.addEventListener("click", function () {
-  document.querySelector("#interface").style.background =
-    "linear-gradient(to right, #f3ecec, #eeeded)";
-  calcShow.style.color = "#111";
-  calSolution.style.color = "#111";
-});
-darkmode.addEventListener("click", function () {
-  document.querySelector("#interface").style.background = "#111";
-  calcShow.style.color = "#fff";
-  calSolution.style.color = "#fff";
-});
+// Constants
+const ZERO = "0";
 
-/////Inventing  Calculator
+// Dark and Light Mode
+daylight.addEventListener("click", switchToLightMode);
+darkmode.addEventListener("click", switchToDarkMode);
 
-//Displaying Calculation on screen
-allButtons.forEach((button, i) => {
-  button.addEventListener("click", function () {
-    if (calcShow.textContent === "0") calcShow.textContent = "";
+function switchToLightMode() {
+  setInterfaceStyles("#f3ecec", "#1e1e1e");
+}
 
-    calcShow.textContent += allButtons[i].textContent; // calcShow.textContent + allButtons[i].textContent
-  });
-});
+function switchToDarkMode() {
+  setInterfaceStyles("#1e1e1e", "#fafafa");
+}
 
-//Displaying Result
-equalButton.addEventListener("click", function () {
-  calSolution.textContent = Function("return " + calcShow.textContent)();
+function setInterfaceStyles(background, textColor) {
+  document.querySelector("#interface").style.background = background;
+  calculationDisplay.style.color = textColor;
+  calculationSolution.style.color = textColor;
+}
+
+// Calculator Logic
+allButtons.forEach((button) => {
+  button.addEventListener("click", handleButtonClick);
 });
 
-//Clear all calculation on the screen
-clearAllButton.addEventListener("click", function () {
-  calcShow.textContent = "0";
-  calSolution.textContent = "0";
-});
+function handleButtonClick() {
+  if (calculationDisplay.textContent === ZERO) {
+    calculationDisplay.textContent = "";
+  }
 
-//Delete Last number
-deleteButton.addEventListener("click", function () {
-  const delLastNumber = calcShow.textContent.slice(0, -1);
-  calcShow.textContent = delLastNumber;
-});
+  calculationDisplay.textContent += this.textContent;
+}
 
-////////Implementing date and time
-setInterval(function () {
+equalButton.addEventListener("click", calculateResult);
+clearAllButton.addEventListener("click", clearAll);
+deleteButton.addEventListener("click", deleteLastNumber);
+
+function calculateResult() {
+  calculationSolution.textContent = Function("return " + calculationDisplay.textContent)();
+}
+
+function clearAll() {
+  calculationDisplay.textContent = ZERO;
+  calculationSolution.textContent = ZERO;
+}
+
+function deleteLastNumber() {
+  const delLastNumber = calculationDisplay.textContent.slice(0, -1);
+  calculationDisplay.textContent = delLastNumber;
+}
+
+// Date and Time
+setInterval(updateTime, 10);
+
+function updateTime() {
   const date = new Date();
-  time.textContent = `${date.getHours()}: ${date.getMinutes()}: ${date.getSeconds()}`;
-  let dayWord = date.getDay();
-  let days = ["SUN", "MON", "TEU", "WED", "THU", "FRI", "SAT"];
-  day.textContent = days[dayWord];
-}, 10);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
 
-//2: 5
-//2: 10
-//10: 5
-//12: 00
+  timeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+  const dayWord = date.getDay();
+  const days = ["SUN", "MON", "TEU", "WED", "THU", "FRI", "SAT"];
+  dayDisplay.textContent = days[dayWord];
+}
